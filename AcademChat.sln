@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcademChatAPI", "AcademChat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcademChatClient", "AcademChatClient\AcademChatClient.csproj", "{53E4DD34-1462-4D35-9A43-D6B62B782CD2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatClient", "ChatClient\ChatClient.csproj", "{7B6CBDFE-8687-4EAA-9E28-51C3E86359BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{53E4DD34-1462-4D35-9A43-D6B62B782CD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53E4DD34-1462-4D35-9A43-D6B62B782CD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53E4DD34-1462-4D35-9A43-D6B62B782CD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B6CBDFE-8687-4EAA-9E28-51C3E86359BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B6CBDFE-8687-4EAA-9E28-51C3E86359BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B6CBDFE-8687-4EAA-9E28-51C3E86359BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B6CBDFE-8687-4EAA-9E28-51C3E86359BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

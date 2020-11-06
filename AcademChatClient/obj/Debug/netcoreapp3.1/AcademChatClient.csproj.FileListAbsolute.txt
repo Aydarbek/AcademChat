@@ -1,0 +1,17 @@
+D:\Repos\AcademChat\AcademChat\AcademChatClient\bin\Debug\netcoreapp3.1\AcademChatClient.exe
+D:\Repos\AcademChat\AcademChat\AcademChatClient\obj\Debug\netcoreapp3.1\AcademChatClient.csprojAssemblyReference.cache
+D:\Repos\AcademChat\AcademChat\AcademChatClient\obj\Debug\netcoreapp3.1\AcademChatClient.csproj.GenerateResource.cache
+D:\Repos\AcademChat\AcademChat\AcademChatClient\obj\Debug\netcoreapp3.1\AcademChatClient.AssemblyInfoInputs.cache
+D:\Repos\AcademChat\AcademChat\AcademChatClient\obj\Debug\netcoreapp3.1\AcademChatClient.AssemblyInfo.cs
+D:\Repos\AcademChat\AcademChat\AcademChatClient\bin\Debug\netcoreapp3.1\AcademChatClient.deps.json
+D:\Repos\AcademChat\AcademChat\AcademChatClient\bin\Debug\netcoreapp3.1\AcademChatClient.runtimeconfig.json
+D:\Repos\AcademChat\AcademChat\AcademChatClient\bin\Debug\netcoreapp3.1\AcademChatClient.runtimeconfig.dev.json
+D:\Repos\AcademChat\AcademChat\AcademChatClient\bin\Debug\netcoreapp3.1\AcademChatClient.dll
+D:\Repos\AcademChat\AcademChat\AcademChatClient\bin\Debug\netcoreapp3.1\AcademChatClient.pdb
+D:\Repos\AcademChat\AcademChat\AcademChatClient\bin\Debug\netcoreapp3.1\websocket-sharp-core.dll
+D:\Repos\AcademChat\AcademChat\AcademChatClient\obj\Debug\netcoreapp3.1\AcademChatClient.ChatClient.resources
+D:\Repos\AcademChat\AcademChat\AcademChatClient\obj\Debug\netcoreapp3.1\AcademChatClient.csproj.CoreCompileInputs.cache
+D:\Repos\AcademChat\AcademChat\AcademChatClient\obj\Debug\netcoreapp3.1\AcademChatClient.csproj.CopyComplete
+D:\Repos\AcademChat\AcademChat\AcademChatClient\obj\Debug\netcoreapp3.1\AcademChatClient.dll
+D:\Repos\AcademChat\AcademChat\AcademChatClient\obj\Debug\netcoreapp3.1\AcademChatClient.pdb
+D:\Repos\AcademChat\AcademChat\AcademChatClient\obj\Debug\netcoreapp3.1\AcademChatClient.genruntimeconfig.cache
