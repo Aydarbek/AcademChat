@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace WoodChessV1.WebSocketManager
+namespace AcademChatAPI.WebSocketManager
 {
     public abstract class WebSocketHandler
     {
@@ -24,6 +24,7 @@ namespace WoodChessV1.WebSocketManager
 
         public virtual async Task OnDisconnected(WebSocket socket)
         {
+            await SendMessageToAllAsync($"User is disconnected: \r\n{wsConnectionManager.GetId(socket)}");
             await wsConnectionManager.RemoveSocket(wsConnectionManager.GetId(socket));
         }
 
@@ -32,7 +33,7 @@ namespace WoodChessV1.WebSocketManager
             if (socket == null || socket.State != WebSocketState.Open)
                 return;
 
-            await socket.SendAsync(buffer: new ArraySegment<byte>(array: Encoding.ASCII.GetBytes(message),
+            await socket.SendAsync(buffer: new ArraySegment<byte>(array: Encoding.UTF8.GetBytes(message),
                                                                   offset: 0,
                                                                   count: message.Length),
                                    messageType: WebSocketMessageType.Text,

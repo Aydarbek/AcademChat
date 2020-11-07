@@ -10,7 +10,6 @@ namespace AcademChatAPI.Repository
     public class ChatContext : DbContext
     {
         public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<ChatRoom> ChatRooms { get; set; }
         public virtual DbSet<Message> Messages { get; set; }
 
         public ChatContext() { }

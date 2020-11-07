@@ -22,14 +22,7 @@ namespace AcademChatAPI.Entities
         public long to_user_id { get; set; }
 
         [ForeignKey("to_user_id")]
-        public User to_user { get; set; }
-
-        public long chat_room_id { get; set; }
-
-        [ForeignKey("chat_room_id")]
-        public ChatRoom ChatRoom { get; set; }
-
-        public int? message_num { get; set; }
+        public User To_User { get; set; }
 
         public string text { get; set; }
 

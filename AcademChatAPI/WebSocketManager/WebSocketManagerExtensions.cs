@@ -6,9 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using WoodChessV1.WebSocketManager;
 
-namespace WoodChessV1.WebSocketManager
+namespace AcademChatAPI.WebSocketManager
 {
     public static class WebSocketManagerExtensions
     {
@@ -20,7 +19,7 @@ namespace WoodChessV1.WebSocketManager
             foreach(var type in Assembly.GetEntryAssembly().ExportedTypes)
             {
                 if (type.GetTypeInfo().BaseType == typeof(WebSocketHandler))
-                    services.AddSingleton(type);
+                    services.AddTransient(type);
             }
 
             return services;

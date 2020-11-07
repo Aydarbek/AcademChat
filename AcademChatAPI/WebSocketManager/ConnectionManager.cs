@@ -6,7 +6,8 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WoodChessV1.WebSocketManager
+namespace AcademChatAPI.WebSocketManager
+
 {
     public class ConnectionManager
     {

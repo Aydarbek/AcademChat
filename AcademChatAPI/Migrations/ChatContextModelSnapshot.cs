@@ -19,38 +19,12 @@ namespace AcademChatAPI.Migrations
                 .HasAnnotation("ProductVersion", "3.1.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("AcademChatAPI.Entities.ChatRoom", b =>
-                {
-                    b.Property<long>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<long?>("Userid")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("name")
-                        .HasColumnType("text");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("Userid");
-
-                    b.ToTable("ChatRooms");
-                });
-
             modelBuilder.Entity("AcademChatAPI.Entities.Message", b =>
                 {
                     b.Property<long>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<long>("chat_room_id")
-                        .HasColumnType("bigint");
-
-                    b.Property<int?>("message_num")
-                        .HasColumnType("integer");
 
                     b.Property<string>("text")
                         .HasColumnType("text");
@@ -65,8 +39,6 @@ namespace AcademChatAPI.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
-
-                    b.HasIndex("chat_room_id");
 
                     b.HasIndex("to_user_id");
 
@@ -84,8 +56,8 @@ namespace AcademChatAPI.Migrations
 
                     b.Property<string>("name")
                         .IsRequired()
-                        .HasColumnType("character varying(30)")
-                        .HasMaxLength(30);
+                        .HasColumnType("character varying(10)")
+                        .HasMaxLength(10);
 
                     b.Property<string>("position")
                         .HasColumnType("character varying(30)")
@@ -95,27 +67,55 @@ namespace AcademChatAPI.Migrations
                         .HasColumnType("character varying(32)")
                         .HasMaxLength(32);
 
+                    b.Property<string>("status")
+                        .HasColumnType("character varying(30)")
+                        .HasMaxLength(30);
+
                     b.HasKey("id");
 
                     b.ToTable("Users");
-                });
 
-            modelBuilder.Entity("AcademChatAPI.Entities.ChatRoom", b =>
-                {
-                    b.HasOne("AcademChatAPI.Entities.User", null)
-                        .WithMany("ChatRooms")
-                        .HasForeignKey("Userid");
+                    b.HasData(
+                        new
+                        {
+                            id = 1L,
+                            name = "VitalyV",
+                            position = "CEO",
+                            secret = "B/9HOf6JVnY+eHf4bLqarA=="
+                        },
+                        new
+                        {
+                            id = 2L,
+                            name = "ValeryM",
+                            position = "CTO",
+                            secret = "B/9HOf6JVnY+eHf4bLqarA=="
+                        },
+                        new
+                        {
+                            id = 3L,
+                            name = "MatveyF",
+                            position = "Lead",
+                            secret = "B/9HOf6JVnY+eHf4bLqarA=="
+                        },
+                        new
+                        {
+                            id = 4L,
+                            name = "NatalyaN",
+                            position = "CFO",
+                            secret = "B/9HOf6JVnY+eHf4bLqarA=="
+                        },
+                        new
+                        {
+                            id = 5L,
+                            name = "AydarA",
+                            position = "SWE",
+                            secret = "B/9HOf6JVnY+eHf4bLqarA=="
+                        });
                 });
 
             modelBuilder.Entity("AcademChatAPI.Entities.Message", b =>
                 {
-                    b.HasOne("AcademChatAPI.Entities.ChatRoom", "ChatRoom")
-                        .WithMany("Messages")
-                        .HasForeignKey("chat_room_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AcademChatAPI.Entities.User", "to_user")
+                    b.HasOne("AcademChatAPI.Entities.User", "To_User")
                         .WithMany()
                         .HasForeignKey("to_user_id")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -1,0 +1,9 @@
+D:\Repos\AcademChat\AcademChat\WsChatModels\bin\Debug\netstandard2.0\WsChatModels.deps.json
+D:\Repos\AcademChat\AcademChat\WsChatModels\bin\Debug\netstandard2.0\WsChatModels.dll
+D:\Repos\AcademChat\AcademChat\WsChatModels\bin\Debug\netstandard2.0\WsChatModels.pdb
+D:\Repos\AcademChat\AcademChat\WsChatModels\obj\Debug\netstandard2.0\WsChatModels.csprojAssemblyReference.cache
+D:\Repos\AcademChat\AcademChat\WsChatModels\obj\Debug\netstandard2.0\WsChatModels.AssemblyInfoInputs.cache
+D:\Repos\AcademChat\AcademChat\WsChatModels\obj\Debug\netstandard2.0\WsChatModels.AssemblyInfo.cs
+D:\Repos\AcademChat\AcademChat\WsChatModels\obj\Debug\netstandard2.0\WsChatModels.csproj.CoreCompileInputs.cache
+D:\Repos\AcademChat\AcademChat\WsChatModels\obj\Debug\netstandard2.0\WsChatModels.dll
+D:\Repos\AcademChat\AcademChat\WsChatModels\obj\Debug\netstandard2.0\WsChatModels.pdb

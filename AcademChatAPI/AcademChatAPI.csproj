@@ -20,4 +20,10 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="WsChatModels">
+      <HintPath>..\WsChatModels\bin\Debug\netstandard2.0\WsChatModels.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

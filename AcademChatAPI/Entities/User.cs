@@ -14,8 +14,11 @@ namespace AcademChatAPI.Entities
         public long id { get; set; }
 
         [Required]
-        [StringLength(30)]
+        [StringLength(10)]
         public string name { get; set; }
+
+        [StringLength (30)]
+        public string status { get; set; }
 
         [Newtonsoft.Json.JsonIgnore]
         [System.Text.Json.Serialization.JsonIgnore]
@@ -33,7 +36,5 @@ namespace AcademChatAPI.Entities
 
         [StringLength(30)]
         public string position { get; set; }
-
-        public List<ChatRoom> ChatRooms { get; set; }
     }
 }

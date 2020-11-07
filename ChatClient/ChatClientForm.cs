@@ -1,45 +1,74 @@
 ﻿using System;
-using System.Net.WebSockets;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using WebSocketSharp;
+using WsChatModels;
+using WsChatModels.Entities;
+using Newtonsoft.Json;
 
 namespace ChatClient
 {
     public partial class ChatClientForm : Form
     {
         private delegate void SafeCallDelegate(string text);
-        private Action SafeCallDelegateWithoutParams;
+        public User CurrentUser { get; private set; }
 
-        WSClient wsClient;
-        object locker = new object();
+        internal WebSocket webSocket;
 
         public ChatClientForm()
         {
-            InitializeComponent();
-            wsClient = new WSClient();
-            wsClient.InitWebSocket();
+            InitializeComponent();            
         }
 
 
         private void ChatClientForm_Load(object sender, EventArgs e)
         {
-            mainTextBox.Text = "ChatClient connected!";
-            wsClient.webSocket.OnMessage += ReceveWsMessage;
+            InitWebSocket();
         }
 
+        private void InitWebSocket()
+        {
+            if (webSocket != null && webSocket.ReadyState == WebSocketState.Open)
+                return;
+
+            webSocket = new WebSocketSharp.WebSocket("ws://localhost:5000/ws");
+            webSocket.Connect();
+
+            webSocket.OnOpen += (sender, e) => PrintWsMessage("WebSocket Connected!");
+            webSocket.OnError += (sender, e) => PrintWsMessage(e.Message);
+            webSocket.OnClose += (sender, e) => PrintWsMessage("WebSocket Closed.");
+            webSocket.OnMessage += ReceveWsMessage;
+        }
+
+
+        internal void WsSendChatMessage(string message, string toUserId = "")
+        {
+            try
+            {
+                WsMessage chatMessage = new WsMessage
+                {
+                    fromUserId = 2,
+                    type = WsMessageType.Chat,
+                    data = message
+                };
+
+                if (toUserId != "")
+                    chatMessage.parameters.Add("toUserId", toUserId);
+
+                webSocket.Send(JsonConvert.SerializeObject(chatMessage));
+                ResetTextInput();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
 
         private void ReceveWsMessage(object sender, WebSocketSharp.MessageEventArgs e)
         {
             Debug.WriteLine($"Message received: {e.Data}");
-            PrintWsMessage(e.Data);
+            PrintWsMessage(e.Data.Trim('"'));
         }
 
         private void PrintWsMessage(string text)
@@ -51,22 +80,48 @@ namespace ChatClient
             }
             else
             {
-                mainTextBox.AppendText(":" + "\n" + text + "\n" + ":");
+                mainTextBox.AppendText(text + "\r\n");
             }
         }
 
 
         private void ChatClientForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            wsClient.webSocket.CloseAsync();
+            webSocket.Close();
         }
 
         private void sendButton_Click(object sender, EventArgs e)
         {
-            string message = inputTextBox.Text;
-            wsClient.webSocket.Send(message);
-            inputTextBox.Text = "";
+            if (inputTextBox.Text != "")
+                SendMessage(inputTextBox.Text);
         }
 
+        private void SendMessage(string message)
+        {
+            WsSendChatMessage(message);
+        }
+
+        private void inputTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (inputTextBox.Text != "")
+                    SendMessage(inputTextBox.Text);
+                ResetTextInput();
+            }
+        }
+
+        private void ResetTextInput(string text = "")
+        {
+            if (this.inputTextBox.InvokeRequired)
+            {
+                var d = new SafeCallDelegate(ResetTextInput);
+                inputTextBox.Invoke(d, new object[] { string.Empty });
+            }
+            else
+            {
+                inputTextBox.Text = string.Empty;
+            }
+        }
     }
 }

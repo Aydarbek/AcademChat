@@ -36,8 +36,11 @@
             this.inputTextBox = new System.Windows.Forms.TextBox();
             this.sendButton = new System.Windows.Forms.Button();
             this.controlPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.UserNameText = new System.Windows.Forms.TextBox();
+            this.publicChatButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.chatPanel.SuspendLayout();
+            this.controlPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -53,7 +56,7 @@
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(826, 570);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1020, 568);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // chatPanel
@@ -63,9 +66,9 @@
             this.chatPanel.Controls.Add(this.inputTextBox);
             this.chatPanel.Controls.Add(this.sendButton);
             this.chatPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.chatPanel.Location = new System.Drawing.Point(213, 3);
+            this.chatPanel.Location = new System.Drawing.Point(263, 3);
             this.chatPanel.Name = "chatPanel";
-            this.chatPanel.Size = new System.Drawing.Size(610, 564);
+            this.chatPanel.Size = new System.Drawing.Size(754, 562);
             this.chatPanel.TabIndex = 0;
             // 
             // flowLayoutPanel2
@@ -77,25 +80,27 @@
             // 
             // mainTextBox
             // 
+            this.mainTextBox.Font = new System.Drawing.Font("Arial Narrow", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.mainTextBox.Location = new System.Drawing.Point(3, 17);
             this.mainTextBox.Multiline = true;
             this.mainTextBox.Name = "mainTextBox";
             this.mainTextBox.ReadOnly = true;
-            this.mainTextBox.Size = new System.Drawing.Size(598, 398);
+            this.mainTextBox.Size = new System.Drawing.Size(756, 459);
             this.mainTextBox.TabIndex = 1;
             // 
             // inputTextBox
             // 
-            this.inputTextBox.Location = new System.Drawing.Point(3, 421);
-            this.inputTextBox.Multiline = true;
+            this.inputTextBox.Font = new System.Drawing.Font("Arial Narrow", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.inputTextBox.Location = new System.Drawing.Point(3, 482);
             this.inputTextBox.Name = "inputTextBox";
-            this.inputTextBox.Size = new System.Drawing.Size(598, 89);
+            this.inputTextBox.Size = new System.Drawing.Size(751, 30);
             this.inputTextBox.TabIndex = 2;
+            this.inputTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.inputTextBox_KeyDown);
             // 
             // sendButton
             // 
             this.sendButton.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.sendButton.Location = new System.Drawing.Point(3, 516);
+            this.sendButton.Location = new System.Drawing.Point(3, 518);
             this.sendButton.Name = "sendButton";
             this.sendButton.Size = new System.Drawing.Size(109, 39);
             this.sendButton.TabIndex = 3;
@@ -105,19 +110,44 @@
             // 
             // controlPanel
             // 
+            this.controlPanel.Controls.Add(this.UserNameText);
+            this.controlPanel.Controls.Add(this.publicChatButton);
             this.controlPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.controlPanel.Location = new System.Drawing.Point(3, 3);
             this.controlPanel.Name = "controlPanel";
-            this.controlPanel.Size = new System.Drawing.Size(204, 564);
+            this.controlPanel.Size = new System.Drawing.Size(254, 562);
             this.controlPanel.TabIndex = 1;
+            // 
+            // UserNameText
+            // 
+            this.UserNameText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
+            this.UserNameText.Location = new System.Drawing.Point(3, 3);
+            this.UserNameText.Name = "UserNameText";
+            this.UserNameText.ReadOnly = true;
+            this.UserNameText.Size = new System.Drawing.Size(251, 30);
+            this.UserNameText.TabIndex = 0;
+            this.UserNameText.Text = "UserName";
+            // 
+            // publicChatButton
+            // 
+            this.publicChatButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.publicChatButton.Location = new System.Drawing.Point(3, 39);
+            this.publicChatButton.Name = "publicChatButton";
+            this.publicChatButton.Size = new System.Drawing.Size(251, 33);
+            this.publicChatButton.TabIndex = 1;
+            this.publicChatButton.Text = "Public Chat";
+            this.publicChatButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.publicChatButton.UseVisualStyleBackColor = true;
             // 
             // ChatClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(826, 570);
+            this.ClientSize = new System.Drawing.Size(1020, 568);
             this.Controls.Add(this.tableLayoutPanel1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "ChatClientForm";
             this.Text = "ChatClient";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChatClientForm_FormClosing);
@@ -125,6 +155,8 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.chatPanel.ResumeLayout(false);
             this.chatPanel.PerformLayout();
+            this.controlPanel.ResumeLayout(false);
+            this.controlPanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -138,6 +170,8 @@
         private System.Windows.Forms.TextBox inputTextBox;
         private System.Windows.Forms.Button sendButton;
         private System.Windows.Forms.FlowLayoutPanel controlPanel;
+        private System.Windows.Forms.TextBox UserNameText;
+        private System.Windows.Forms.Button publicChatButton;
     }
 }
 
