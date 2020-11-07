@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AcademChatAPI.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    [Migration("20201107125851_InitialDb")]
+    [Migration("20201107201659_InitialDb")]
     partial class InitialDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,7 @@ namespace AcademChatAPI.Migrations
                     b.Property<DateTime>("time_stamp")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<long>("to_user_id")
+                    b.Property<long?>("to_user_id")
                         .HasColumnType("bigint");
 
                     b.Property<long>("user_id")
@@ -119,9 +119,7 @@ namespace AcademChatAPI.Migrations
                 {
                     b.HasOne("AcademChatAPI.Entities.User", "To_User")
                         .WithMany()
-                        .HasForeignKey("to_user_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("to_user_id");
 
                     b.HasOne("AcademChatAPI.Entities.User", "User")
                         .WithMany()

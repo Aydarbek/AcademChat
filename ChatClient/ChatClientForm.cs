@@ -24,6 +24,7 @@ namespace ChatClient
         private void ChatClientForm_Load(object sender, EventArgs e)
         {
             InitWebSocket();
+            this.ActiveControl = inputTextBox;
         }
 
         private void InitWebSocket()

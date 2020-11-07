@@ -19,7 +19,7 @@ namespace AcademChatAPI.Entities
         [ForeignKey("user_id")]
         public User User { get; set; }
 
-        public long to_user_id { get; set; }
+        public long? to_user_id { get; set; }
 
         [ForeignKey("to_user_id")]
         public User To_User { get; set; }

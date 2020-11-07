@@ -31,7 +31,7 @@ namespace AcademChatAPI.Migrations
                     id = table.Column<long>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     user_id = table.Column<long>(nullable: false),
-                    to_user_id = table.Column<long>(nullable: false),
+                    to_user_id = table.Column<long>(nullable: true),
                     text = table.Column<string>(nullable: true),
                     time_stamp = table.Column<DateTime>(nullable: false)
                 },
@@ -43,7 +43,7 @@ namespace AcademChatAPI.Migrations
                         column: x => x.to_user_id,
                         principalTable: "Users",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Messages_Users_user_id",
                         column: x => x.user_id,

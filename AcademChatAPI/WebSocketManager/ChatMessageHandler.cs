@@ -62,7 +62,10 @@ namespace AcademChatAPI.WebSocketManager
                 if (UserWebsockets.ContainsKey(fromUser.name))
                 {
                     if(UserWebsockets[fromUser.name] != currWebsocket)
+                    {
                         UserWebsockets[fromUser.name] = currWebsocket;
+                        await SendMessageToAllAsync($"{fromUser.name} is now reconnected");
+                    }
                 }
                 else
                 {
@@ -74,6 +77,25 @@ namespace AcademChatAPI.WebSocketManager
             if (wsMessage.type == WsMessageType.Chat)
             {
                 string message = $"{fromUser.name} ({DateTime.Now.ToString("HH:mm")}): {wsMessage.data} ";
+                long toUserId = -1;
+
+                if (wsMessage.parameters.ContainsKey("toUserId"))
+                    Int64.TryParse(wsMessage.parameters["toUserId"], out toUserId);
+
+               
+                Message newMessage = new Message
+                {
+                    User = fromUser,
+                    text = wsMessage.data,
+                    time_stamp = DateTime.Now
+                };
+
+                if (toUserId != -1)
+                    newMessage.To_User = _context.Users.Find(toUserId);
+
+                _context.Add(newMessage);
+                await _context.SaveChangesAsync();
+                
                 await SendMessageToAllAsync(JsonConvert.SerializeObject(message));
             }
         }
