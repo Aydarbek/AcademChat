@@ -14,6 +14,7 @@ namespace ChatClient
         public User CurrentUser { get; private set; }
 
         internal WebSocket webSocket;
+        LoginForm loginForm;
 
         public ChatClientForm()
         {
@@ -25,6 +26,8 @@ namespace ChatClient
         {
             InitWebSocket();
             this.ActiveControl = inputTextBox;
+            loginForm = new LoginForm();
+            loginForm.ShowDialog();
         }
 
         private void InitWebSocket()
@@ -39,6 +42,25 @@ namespace ChatClient
             webSocket.OnError += (sender, e) => PrintWsMessage(e.Message);
             webSocket.OnClose += (sender, e) => PrintWsMessage("WebSocket Closed.");
             webSocket.OnMessage += ReceveWsMessage;
+        }
+
+        public void WsSendAuthenticationRequest(string userName, string password)
+        {
+            try
+            {
+                WsMessage authRequest = new WsMessage
+                {
+                    type = WsMessageType.AuthRequest
+                };
+                authRequest.parameters.Add("userName", userName);
+                authRequest.parameters.Add("password", password);
+
+                webSocket.Send(JsonConvert.SerializeObject(authRequest));
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
 
@@ -68,8 +90,30 @@ namespace ChatClient
 
         private void ReceveWsMessage(object sender, WebSocketSharp.MessageEventArgs e)
         {
-            Debug.WriteLine($"Message received: {e.Data}");
-            PrintWsMessage(e.Data.Trim('"'));
+            try
+            {
+                WsMessage wsMessage = JsonConvert.DeserializeObject<WsMessage>(e.Data);
+                if (wsMessage == null)
+                    return;
+
+                if (wsMessage.type == WsMessageType.Chat ||
+                   wsMessage.type == WsMessageType.System)
+                    PrintWsMessage(e.Data.Trim('"'));
+
+                else if (wsMessage.type == WsMessageType.AuthGrant)
+                    EnterProgram();
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+        private void EnterProgram()
+        {
+            loginForm.Close();
         }
 
         private void PrintWsMessage(string text)

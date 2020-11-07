@@ -6,7 +6,8 @@ namespace WsChatModels
     [Serializable]
     public enum WsMessageType
     {
-        System, Chat, Request,  User, Users, Message, Messages, ChatGroup, ChatGroups
+        System, Chat, AuthRequest, AuthGrant,
+        Request,  User, Users, Message, Messages, ChatGroup, ChatGroups
     }
 
     [Serializable]
@@ -14,13 +15,13 @@ namespace WsChatModels
     {
         public WsMessageType type;
         public string data;
-        public long fromUserId;
+        public long? fromUserId;
 
         public Dictionary<string, string> parameters = new Dictionary<string, string>();
 
         public WsMessage() { }
 
-        public WsMessage(long fromUserId, WsMessageType type, string data)
+        public WsMessage(long? fromUserId, WsMessageType type, string data)
         {
             this.fromUserId = fromUserId;
             this.type = type;
