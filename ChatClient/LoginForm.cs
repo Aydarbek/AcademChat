@@ -28,14 +28,14 @@ namespace ChatClient
         {
             WsChatModels.Message wsMessage = JsonConvert.DeserializeObject<WsChatModels.Message>(e.Data);
             if (wsMessage != null && wsMessage.type == WsMessageType.System)
-                PrintWsMessage(wsMessage.data);
+                PrintMessage(wsMessage.data);
         }
 
-        private void PrintWsMessage(string data)
+        internal void PrintMessage(string data)
         {
             if (this.statusBox.InvokeRequired)
             {
-                var d = new SafeCallDelegate(PrintWsMessage);
+                var d = new SafeCallDelegate(PrintMessage);
                 statusBox.Invoke(d, new object[] { data });
             }
             else

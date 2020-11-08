@@ -7,18 +7,23 @@ using Newtonsoft.Json;
 using Message = WsChatModels.Message;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Windows.Forms.VisualStyles;
+using System.Drawing;
 
 namespace ChatClient
 {
     public partial class chatClientForm : Form
     {
         private delegate void SafeCallDelegate(string text);
+        Action threadSafeAction;
+        Action<User> setUserDataSafe;
 
-        Action threadSafeActionEmpty;
-        Action<string> threadSafeAction;
+        int connectionCounter;
 
         private delegate void SafeCallDelegateEmpty();
         public User CurrentUser { get; private set; }
+        long? selectedUserId = null;
 
         internal WebSocket webSocket;
         loginForm loginForm;
@@ -65,16 +70,30 @@ namespace ChatClient
                 authRequest.parameters.Add("userName", userName);
                 authRequest.parameters.Add("password", password);
 
+                while (webSocket.ReadyState != WebSocketState.Open)
+                {
+                    InitWebSocket();
+                    connectionCounter++;
+                    if (connectionCounter >= 5)
+                        throw new Exception("Server not available");
+                    Thread.Sleep(100);
+                }
+                connectionCounter = 0;
                 webSocket.Send(JsonConvert.SerializeObject(authRequest));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                if (loginForm.Modal)
+                {
+                    loginForm.PrintMessage(ex.Message);
+                }
+
+                Debug.WriteLine(ex.Message);
             }
         }
 
 
-        internal void WsSendChatMessage(string message, string toUserId = "")
+        internal void WsSendChatMessage(string message, long? toUserId)
         {
             try
             {
@@ -83,11 +102,10 @@ namespace ChatClient
                     user_id = CurrentUser.id,
                     type = WsMessageType.Chat,
                     data = message,
+                    to_user_id = toUserId,
                     time_stamp = DateTime.Now
                 };
 
-                if (toUserId != "")
-                    chatMessage.parameters.Add("toUserId", toUserId);
 
                 webSocket.Send(JsonConvert.SerializeObject(chatMessage));
                 ResetTextInput();
@@ -124,7 +142,12 @@ namespace ChatClient
                 switch (wsMessage.type)
                 {
                     case WsMessageType.Chat:
-                        PrintWsMessage($"{wsMessage.User.name} {wsMessage.time_stamp.ToString("HH:mm")}:  {wsMessage.data.Trim('\"')}");
+                        if (selectedUserId != null && 
+                            (selectedUserId == wsMessage.user_id || selectedUserId == wsMessage.to_user_id) &&
+                            (CurrentUser.id == wsMessage.user_id || CurrentUser.id == wsMessage.to_user_id))
+                            PrintWsMessage($"{wsMessage.User.name} {wsMessage.time_stamp.ToString("HH:mm")}:  {wsMessage.data.Trim('\"')}");
+                        else if (selectedUserId == null)
+                            PrintWsMessage($"{wsMessage.User.name} {wsMessage.time_stamp.ToString("HH:mm")}:  {wsMessage.data.Trim('\"')}");
                         break;
                     case WsMessageType.System:
                         PrintWsMessage($"System {wsMessage.time_stamp.ToString("HH:mm")}:  {wsMessage.data.Trim('\"')}");
@@ -148,13 +171,12 @@ namespace ChatClient
 
         private void ShowOnlineUsers(string usersJson)
         {
-            ClearOnlineUsersPanel();
             List<User> users = JsonConvert.DeserializeObject<List<User>>(usersJson).Where(u => !u.name.Equals(CurrentUser.name)).ToList();
-            
+            ClearOnlineUsersPanel();
+
             if (users != null)
                 foreach (User user in users)
-                    AddOnlineUserButton(user.name);
-
+                    AddOnlineUserButton(user);
         }
 
         private void ClearOnlineUsersPanel()
@@ -168,21 +190,46 @@ namespace ChatClient
                 onlineUsersPanel.Controls.Clear();
         }
 
-        private void AddOnlineUserButton(string user)
+        private void AddOnlineUserButton(User user)
         {
             if (this.onlineUsersPanel.InvokeRequired)
             {
-                var d = new SafeCallDelegate(AddOnlineUserButton);
-                onlineUsersPanel.Invoke(d, new object[] { user });
+                setUserDataSafe = AddOnlineUserButton;
+                onlineUsersPanel.Invoke(setUserDataSafe, new object[] { user });
             }
             else
             {
                 Button button = new Button();
-                button.Text = user;
+                button.Text = user.name;
+                button.Tag = user.id;                
                 button.Width = 180;
                 button.Height = 30;
                 onlineUsersPanel.Controls.Add(button);
+                button.Click += new EventHandler(UserButtonClick);
+
+                if (button.Tag.ToString() == selectedUserId.ToString())
+                    button.BackColor = Color.DarkGray;
+                else if (selectedUserId == null)
+                    publicChatButton.BackColor = Color.DarkGray;
             }
+        }
+
+        private void UserButtonClick(object sender, EventArgs e)
+        {
+            Button userButton = (Button)sender;
+            
+            var buttons = GetAll(onlineUsersPanel, typeof(Button));
+            foreach (Button button in buttons)
+            {
+                if (button != userButton)
+                    button.BackColor = Color.LightGray;
+                else
+                    button.BackColor = Color.DarkGray;
+            }
+
+            publicChatButton.BackColor = Color.LightGray;
+
+            selectedUserId = Int64.Parse(userButton.Tag.ToString());            
         }
 
         private void EnterProgram(Message wsMessage)
@@ -204,8 +251,8 @@ namespace ChatClient
         {
             if (userNameText.InvokeRequired)
             {
-                threadSafeActionEmpty = SetUserNameTextSafely;
-                userNameText.Invoke(threadSafeActionEmpty);
+                threadSafeAction = SetUserNameTextSafely;
+                userNameText.Invoke(threadSafeAction);
             }
             else
                 userNameText.Text = CurrentUser.name;
@@ -216,8 +263,8 @@ namespace ChatClient
         {
             if (statusTextBox.InvokeRequired)
             {
-                threadSafeActionEmpty = SetUserStatusTextSafely;
-                userNameText.Invoke(threadSafeActionEmpty);
+                threadSafeAction = SetUserStatusTextSafely;
+                userNameText.Invoke(threadSafeAction);
             }
             else
                 statusTextBox.Text = CurrentUser.status;
@@ -266,7 +313,7 @@ namespace ChatClient
         {
             if (CurrentUser == null)
                 loginForm.ShowDialog();
-            WsSendChatMessage(message);
+            WsSendChatMessage(message, selectedUserId);
         }
 
         private void inputTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -321,6 +368,29 @@ namespace ChatClient
         {
             acceptStatusButton.Visible = isVisible;
             cancelStatusButton.Visible = isVisible;
+        }
+
+        private IEnumerable<Control> GetAll(Control control, Type type)
+        {
+            var controls = control.Controls.Cast<Control>();
+
+            return controls.SelectMany(ctrl => GetAll(ctrl, type))
+                                      .Concat(controls)
+                                      .Where(c => c.GetType() == type);
+        }
+
+        private void publicChatButton_Click(object sender, EventArgs e)
+        {
+            SwitchToPublicChat();
+        }
+
+        private void SwitchToPublicChat()
+        {
+            publicChatButton.BackColor = Color.DarkGray;
+            selectedUserId = null;
+            var onlineButtons = GetAll(onlineUsersPanel, typeof(Button));
+            foreach (Button button in onlineButtons)
+                button.BackColor = Color.LightGray;
         }
     }
 }

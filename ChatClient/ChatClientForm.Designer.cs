@@ -58,7 +58,7 @@
             this.mainLayoutPanel.Controls.Add(this.controlPanel, 0, 0);
             this.mainLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainLayoutPanel.Location = new System.Drawing.Point(0, 0);
-            this.mainLayoutPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.mainLayoutPanel.Margin = new System.Windows.Forms.Padding(2);
             this.mainLayoutPanel.Name = "mainLayoutPanel";
             this.mainLayoutPanel.RowCount = 1;
             this.mainLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -73,7 +73,7 @@
             this.chatPanel.Controls.Add(this.sendButton);
             this.chatPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chatPanel.Location = new System.Drawing.Point(197, 2);
-            this.chatPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.chatPanel.Margin = new System.Windows.Forms.Padding(2);
             this.chatPanel.Name = "chatPanel";
             this.chatPanel.Size = new System.Drawing.Size(566, 458);
             this.chatPanel.TabIndex = 0;
@@ -82,7 +82,7 @@
             // 
             this.mainTextBox.Font = new System.Drawing.Font("Arial Narrow", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.mainTextBox.Location = new System.Drawing.Point(2, 2);
-            this.mainTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.mainTextBox.Margin = new System.Windows.Forms.Padding(2);
             this.mainTextBox.Multiline = true;
             this.mainTextBox.Name = "mainTextBox";
             this.mainTextBox.ReadOnly = true;
@@ -93,7 +93,7 @@
             // 
             this.inputTextBox.Font = new System.Drawing.Font("Arial Narrow", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.inputTextBox.Location = new System.Drawing.Point(2, 380);
-            this.inputTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.inputTextBox.Margin = new System.Windows.Forms.Padding(2);
             this.inputTextBox.Name = "inputTextBox";
             this.inputTextBox.Size = new System.Drawing.Size(564, 26);
             this.inputTextBox.TabIndex = 2;
@@ -103,7 +103,7 @@
             // 
             this.sendButton.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.sendButton.Location = new System.Drawing.Point(2, 410);
-            this.sendButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.sendButton.Margin = new System.Windows.Forms.Padding(2);
             this.sendButton.Name = "sendButton";
             this.sendButton.Size = new System.Drawing.Size(82, 32);
             this.sendButton.TabIndex = 3;
@@ -120,7 +120,7 @@
             this.controlPanel.Controls.Add(this.onlineUsersPanel);
             this.controlPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.controlPanel.Location = new System.Drawing.Point(2, 2);
-            this.controlPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.controlPanel.Margin = new System.Windows.Forms.Padding(2);
             this.controlPanel.Name = "controlPanel";
             this.controlPanel.Size = new System.Drawing.Size(191, 458);
             this.controlPanel.TabIndex = 1;
@@ -129,7 +129,7 @@
             // 
             this.userNameText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
             this.userNameText.Location = new System.Drawing.Point(2, 2);
-            this.userNameText.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.userNameText.Margin = new System.Windows.Forms.Padding(2);
             this.userNameText.Name = "userNameText";
             this.userNameText.ReadOnly = true;
             this.userNameText.Size = new System.Drawing.Size(189, 26);
@@ -143,7 +143,7 @@
             this.statusLayoutPanel.Controls.Add(this.acceptStatusButton);
             this.statusLayoutPanel.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
             this.statusLayoutPanel.Location = new System.Drawing.Point(2, 32);
-            this.statusLayoutPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.statusLayoutPanel.Margin = new System.Windows.Forms.Padding(2);
             this.statusLayoutPanel.Name = "statusLayoutPanel";
             this.statusLayoutPanel.Size = new System.Drawing.Size(188, 59);
             this.statusLayoutPanel.TabIndex = 8;
@@ -153,7 +153,7 @@
             this.statusTextBox.Dock = System.Windows.Forms.DockStyle.Top;
             this.statusTextBox.Font = new System.Drawing.Font("Arial Narrow", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.statusTextBox.Location = new System.Drawing.Point(-1, 2);
-            this.statusTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.statusTextBox.Margin = new System.Windows.Forms.Padding(2);
             this.statusTextBox.Name = "statusTextBox";
             this.statusTextBox.ReadOnly = true;
             this.statusTextBox.Size = new System.Drawing.Size(187, 23);
@@ -165,7 +165,7 @@
             // 
             this.cancelStatusButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.cancelStatusButton.Location = new System.Drawing.Point(167, 29);
-            this.cancelStatusButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.cancelStatusButton.Margin = new System.Windows.Forms.Padding(2);
             this.cancelStatusButton.Name = "cancelStatusButton";
             this.cancelStatusButton.Size = new System.Drawing.Size(19, 20);
             this.cancelStatusButton.TabIndex = 5;
@@ -178,7 +178,7 @@
             // 
             this.acceptStatusButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.acceptStatusButton.Location = new System.Drawing.Point(144, 29);
-            this.acceptStatusButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.acceptStatusButton.Margin = new System.Windows.Forms.Padding(2);
             this.acceptStatusButton.Name = "acceptStatusButton";
             this.acceptStatusButton.Size = new System.Drawing.Size(19, 20);
             this.acceptStatusButton.TabIndex = 6;
@@ -191,13 +191,14 @@
             // 
             this.publicChatButton.Font = new System.Drawing.Font("Arial Narrow", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.publicChatButton.Location = new System.Drawing.Point(2, 95);
-            this.publicChatButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.publicChatButton.Margin = new System.Windows.Forms.Padding(2);
             this.publicChatButton.Name = "publicChatButton";
             this.publicChatButton.Size = new System.Drawing.Size(185, 30);
             this.publicChatButton.TabIndex = 8;
             this.publicChatButton.Text = "Public Chat";
             this.publicChatButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.publicChatButton.UseVisualStyleBackColor = true;
+            this.publicChatButton.Click += new System.EventHandler(this.publicChatButton_Click);
             // 
             // onlineUsersLabel
             // 
@@ -212,7 +213,7 @@
             // 
             // onlineUsersPanel
             // 
-            this.onlineUsersPanel.Location = new System.Drawing.Point(3, 162);
+            this.onlineUsersPanel.Location = new System.Drawing.Point(3, 155);
             this.onlineUsersPanel.Name = "onlineUsersPanel";
             this.onlineUsersPanel.Size = new System.Drawing.Size(184, 280);
             this.onlineUsersPanel.TabIndex = 11;
@@ -225,7 +226,7 @@
             this.Controls.Add(this.mainLayoutPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.Name = "chatClientForm";
             this.Text = "ChatClient";

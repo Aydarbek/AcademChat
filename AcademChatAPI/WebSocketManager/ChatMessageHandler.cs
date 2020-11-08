@@ -111,7 +111,7 @@ namespace AcademChatAPI.WebSocketManager
             switch (wsMessage.type)
             {
                 case (WsMessageType.Chat):
-                    await HandleChatMessage(wsMessage, fromUser);
+                    await HandleChatMessage(wsMessage);
                     break;
                 case (WsMessageType.AuthRequest):
                     await HandleAuthenticationRequest(wsMessage);
@@ -190,21 +190,25 @@ namespace AcademChatAPI.WebSocketManager
 
         }
 
-        private async Task HandleChatMessage(Message wsMessage, User fromUser)
-        {
-            long toUserId = -1;
-
-            if (wsMessage.parameters.ContainsKey("toUserId"))
-                Int64.TryParse(wsMessage.parameters["toUserId"], out toUserId);
-
-
+        private async Task HandleChatMessage(Message wsMessage)
+        {            
             _context.Add(wsMessage);
             await _context.SaveChangesAsync();
 
-            await SendMessageToAllAsync(wsMessage);
+            long? toUserId = null;
+            toUserId = wsMessage.to_user_id;
+
+            if (toUserId != null)
+            {
+                await SendMessageAsync(wsMessage.user_id, wsMessage);
+                await SendMessageAsync(toUserId, wsMessage);
+            }
+            else
+                await SendMessageToAllAsync(wsMessage);
+
         }
 
-        private async Task HandleStatusMessage(Entities.Message wsMessage)
+        private async Task HandleStatusMessage(Message wsMessage)
         {
             User user = _context.Users.Find(wsMessage.user_id);
             if (user != null)
@@ -213,11 +217,14 @@ namespace AcademChatAPI.WebSocketManager
             await _context.SaveChangesAsync();
         }
 
-        private async Task SendMessageAsync (long userId, Entities.Message message)
+        private async Task SendMessageAsync (long? toUserid, Message message)
         {
             try
             {
-                User user = _context.Users.Find(userId);
+                if (toUserid == null)
+                    return;
+
+                User user = _context.Users.Find(toUserid);
                 if (user != null && !UserWebsockets.ContainsKey(user.name))
                     throw new ChatException($"User {user.name} is offline.");
 
