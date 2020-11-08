@@ -8,15 +8,17 @@ using Newtonsoft.Json;
 
 namespace ChatClient
 {
-    public partial class ChatClientForm : Form
+    public partial class chatClientForm : Form
     {
         private delegate void SafeCallDelegate(string text);
+        private delegate void SafeCallDelegateClose();
         public User CurrentUser { get; private set; }
 
         internal WebSocket webSocket;
-        LoginForm loginForm;
+        loginForm loginForm;
+        string statusText;
 
-        public ChatClientForm()
+        public chatClientForm()
         {
             InitializeComponent();            
         }
@@ -26,8 +28,10 @@ namespace ChatClient
         {
             InitWebSocket();
             this.ActiveControl = inputTextBox;
-            loginForm = new LoginForm();
+            loginForm = new loginForm();
             loginForm.ShowDialog();
+            if (loginForm.DialogResult == DialogResult.Cancel)
+                this.Close();
         }
 
         private void InitWebSocket()
@@ -70,7 +74,7 @@ namespace ChatClient
             {
                 WsMessage chatMessage = new WsMessage
                 {
-                    fromUserId = 2,
+                    fromUserId = CurrentUser.id,
                     type = WsMessageType.Chat,
                     data = message
                 };
@@ -88,6 +92,20 @@ namespace ChatClient
             }
         }
 
+
+        private void WsSendStatusUpdate(string newStatus)
+        {
+            WsMessage statusUpdate = new WsMessage
+            {
+                fromUserId = CurrentUser.id,
+                type = WsMessageType.Status,
+                data = newStatus
+            };
+
+            webSocket.Send(JsonConvert.SerializeObject(statusUpdate));
+        }
+
+
         private void ReceveWsMessage(object sender, WebSocketSharp.MessageEventArgs e)
         {
             try
@@ -98,22 +116,50 @@ namespace ChatClient
 
                 if (wsMessage.type == WsMessageType.Chat ||
                    wsMessage.type == WsMessageType.System)
-                    PrintWsMessage(e.Data.Trim('"'));
+                    PrintWsMessage(wsMessage.data.Trim('"'));
 
                 else if (wsMessage.type == WsMessageType.AuthGrant)
+                {
+                    User user = JsonConvert.DeserializeObject<User>(wsMessage.data);
+                    if (user != null)
+                        CurrentUser = user;
                     EnterProgram();
+                }
+
+                else if (wsMessage.type == WsMessageType.AuthRequest)
+                    loginForm.ShowDialog();
 
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                throw;
             }
         }
 
         private void EnterProgram()
         {
-            loginForm.Close();
+            CloseLoginForm();
+            SetUserInfo();
+        }
+
+        private void SetUserInfo()
+        {
+            userNameText.Text = CurrentUser.name;
+            statusTextBox.Text = CurrentUser.status;
+        }
+
+        private void CloseLoginForm()
+        {
+            if (loginForm.InvokeRequired)
+            {
+                var d = new SafeCallDelegateClose(EnterProgram);
+                loginForm.Invoke(d);
+            }
+            else
+            {
+                loginForm.Close();
+                loginForm.DialogResult = DialogResult.OK;
+            }
         }
 
         private void PrintWsMessage(string text)
@@ -143,6 +189,8 @@ namespace ChatClient
 
         private void SendMessage(string message)
         {
+            if (CurrentUser == null)
+                loginForm.ShowDialog();
             WsSendChatMessage(message);
         }
 
@@ -167,6 +215,34 @@ namespace ChatClient
             {
                 inputTextBox.Text = string.Empty;
             }
+        }
+
+
+        private void statusTextBox_MouseUp_1(object sender, MouseEventArgs e)
+        {
+            statusTextBox.ReadOnly = false;
+            acceptStatusButton.Visible = true;
+            cancelStatusButton.Visible = true;
+            statusText = statusTextBox.Text;
+        }
+
+        private void acceptStatusButton_Click(object sender, EventArgs e)
+        {
+            if (statusTextBox.Text.Length <= 30)
+            {
+                statusTextBox.ReadOnly = true;
+                acceptStatusButton.Visible = false;
+                cancelStatusButton.Visible = false;
+                WsSendStatusUpdate(statusTextBox.Text);
+            }
+        }
+
+        private void cancelStatusButton_Click(object sender, EventArgs e)
+        {
+            statusTextBox.Text = statusText;
+            statusTextBox.ReadOnly = true;
+            acceptStatusButton.Visible = false;
+            cancelStatusButton.Visible = false;
         }
     }
 }

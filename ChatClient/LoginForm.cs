@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,17 +8,38 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WsChatModels;
 
 namespace ChatClient
 {
-    public partial class LoginForm : Form
+    public partial class loginForm : Form
     {
-        ChatClientForm MainForm;
+        chatClientForm MainForm;
+        delegate void SafeCallDelegate(string data);
 
-        public LoginForm()
+        public loginForm()
         {
             InitializeComponent();
-            MainForm = (ChatClientForm)Application.OpenForms["ChatClientForm"];
+            MainForm = (chatClientForm)Application.OpenForms["ChatClientForm"];
+            MainForm.webSocket.OnMessage += LoginForm_OnMessage;
+        }
+
+        private void LoginForm_OnMessage(object sender, WebSocketSharp.MessageEventArgs e)
+        {
+            WsMessage wsMessage = JsonConvert.DeserializeObject<WsMessage>(e.Data);
+            if (wsMessage != null && wsMessage.type == WsMessageType.System)
+                PrintWsMessage(wsMessage.data);
+        }
+
+        private void PrintWsMessage(string data)
+        {
+            if (this.statusBox.InvokeRequired)
+            {
+                var d = new SafeCallDelegate(PrintWsMessage);
+                statusBox.Invoke(d, new object[] { data });
+            }
+            else
+                statusBox.Text = data;
         }
 
         private void Login_Click(object sender, EventArgs e)
@@ -25,7 +47,6 @@ namespace ChatClient
             if (userNameBox.Text != "" && passwordBox.Text != "")
                 MainForm.WsSendAuthenticationRequest(userNameBox.Text, passwordBox.Text);
         }
-
 
     }
 }

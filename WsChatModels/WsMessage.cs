@@ -6,7 +6,7 @@ namespace WsChatModels
     [Serializable]
     public enum WsMessageType
     {
-        System, Chat, AuthRequest, AuthGrant,
+        System, Chat, Status, AuthRequest, AuthGrant,
         Request,  User, Users, Message, Messages, ChatGroup, ChatGroups
     }
 

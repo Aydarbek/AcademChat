@@ -11,14 +11,15 @@ using Newtonsoft.Json.Serialization;
 using AcademChatAPI.Exceptions;
 using AcademChatAPI.Repository;
 using AcademChatAPI.Entities;
+using System.Collections.Concurrent;
 
 namespace AcademChatAPI.WebSocketManager
 {
     public class ChatMessageHandler : WebSocketHandler
     {
         ChatContext _context;
-        ILogger<ChatMessageHandler> _logger;        
-        Dictionary<string, WebSocket> UserWebsockets = new Dictionary<string, WebSocket>();
+        ILogger<ChatMessageHandler> _logger;
+        ConcurrentDictionary<string, WebSocket> UserWebsockets = new ConcurrentDictionary<string, WebSocket>();
         WebSocket currWebsocket;
 
         public ChatMessageHandler(ConnectionManager webSocketConnectionManager, ChatContext context,
@@ -47,12 +48,25 @@ namespace AcademChatAPI.WebSocketManager
                 
                 await HandleWsMessage(wsMessage);
             }
+            catch(ChatException ex)
+            {
+                await SendSystemMessage(socketId, ex);
+            }
             catch (Exception e)
             {
                 _logger.LogError(e.Message);
             }
         }
 
+        private async Task SendSystemMessage(string socketId, ChatException ex)
+        {
+            WsMessage wsMessage = new WsMessage
+            {
+                type = WsMessageType.System,
+                data = ex.Message
+            };
+            await SendMessageAsync(socketId, JsonConvert.SerializeObject(wsMessage));
+        }
 
         private async Task HandleWsMessage(WsMessage wsMessage)
         {
@@ -69,35 +83,103 @@ namespace AcademChatAPI.WebSocketManager
                 }
                 else
                 {
-                    UserWebsockets.Add(fromUser.name, currWebsocket);
+                    SendAuthRequest(currWebsocket);
                     await SendMessageToAllAsync($"{fromUser.name} is now connected");
                 }
             }
 
-            if (wsMessage.type == WsMessageType.Chat)
+            switch (wsMessage.type)
             {
-                string message = $"{fromUser.name} ({DateTime.Now.ToString("HH:mm")}): {wsMessage.data} ";
-                long toUserId = -1;
-
-                if (wsMessage.parameters.ContainsKey("toUserId"))
-                    Int64.TryParse(wsMessage.parameters["toUserId"], out toUserId);
-
-               
-                Message newMessage = new Message
-                {
-                    User = fromUser,
-                    text = wsMessage.data,
-                    time_stamp = DateTime.Now
-                };
-
-                if (toUserId != -1)
-                    newMessage.To_User = _context.Users.Find(toUserId);
-
-                _context.Add(newMessage);
-                await _context.SaveChangesAsync();
-                
-                await SendMessageToAllAsync(JsonConvert.SerializeObject(message));
+                case (WsMessageType.Chat):
+                    await HandleChatMessage(wsMessage, fromUser);
+                    break;
+                case (WsMessageType.AuthRequest):
+                    await HandleAuthenticationRequest(wsMessage);
+                    break;
+                case (WsMessageType.Status):
+                    await HandleStatusMessage(wsMessage);
+                    break;
             }
+        }
+
+        private async void SendAuthRequest(WebSocket currWebsocket)
+        {
+            WsMessage authRequest = new WsMessage { type = WsMessageType.AuthRequest };
+            await SendMessageAsync(currWebsocket, JsonConvert.SerializeObject(authRequest));
+
+        }
+
+        private async Task HandleAuthenticationRequest(WsMessage wsMessage)
+        {
+            string userName;
+            string password;
+
+            if (wsMessage.parameters.ContainsKey("userName") &&
+               wsMessage.parameters.ContainsKey("password"))
+            {
+                userName = wsMessage.parameters["userName"];
+                password = wsMessage.parameters["password"];
+            }
+            else
+                throw new ChatException("userName or password is empty");
+
+            User user = _context.Users.FirstOrDefault(u => u.name.Equals(userName));
+            if (user == null)
+                throw new ChatException("User not found");
+
+            WsMessage authGrant = new WsMessage
+            {
+                type = WsMessageType.AuthGrant,
+                data = JsonConvert.SerializeObject(user)
+            };
+
+            if (user.password.Equals(password))
+            {
+                UserWebsockets[userName]= currWebsocket; 
+                await SendMessageAsync(currWebsocket, JsonConvert.SerializeObject(authGrant));
+            }
+            else
+                throw new ChatException("Password is incorrect");
+        }
+
+        private async Task HandleChatMessage(WsMessage wsMessage, User fromUser)
+        {
+            string message = $"{fromUser.name} ({DateTime.Now.ToString("HH:mm")}): {wsMessage.data} ";
+            long toUserId = -1;
+
+            if (wsMessage.parameters.ContainsKey("toUserId"))
+                Int64.TryParse(wsMessage.parameters["toUserId"], out toUserId);
+
+
+            Message newMessage = new Message
+            {
+                User = fromUser,
+                text = wsMessage.data,
+                time_stamp = DateTime.Now
+            };
+
+            if (toUserId != -1)
+                newMessage.To_User = _context.Users.Find(toUserId);
+
+            _context.Add(newMessage);
+            await _context.SaveChangesAsync();
+
+            WsMessage chatMessage = new WsMessage
+            {
+                type = WsMessageType.Chat,
+                data = message
+            };
+
+            await SendMessageToAllAsync(JsonConvert.SerializeObject(chatMessage));
+        }
+
+        private async Task HandleStatusMessage(WsMessage wsMessage)
+        {
+            User user = _context.Users.Find(wsMessage.fromUserId);
+            if (user != null)
+                user.status = wsMessage.data;
+
+            await _context.SaveChangesAsync();
         }
 
         private async Task SendMessageAsync (long userId, WsMessage message)
