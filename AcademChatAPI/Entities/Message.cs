@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using WsChatModels;
 
 namespace AcademChatAPI.Entities
 {
@@ -13,8 +14,12 @@ namespace AcademChatAPI.Entities
         [Required]
         public long id { get; set; }
 
+        public WsMessageType type { get; set; }
+
+        public string data { get; set; }
+
         [Required]
-        public long user_id { get; set; }
+        public long? user_id { get; set; }
 
         [ForeignKey("user_id")]
         public User User { get; set; }
@@ -24,8 +29,10 @@ namespace AcademChatAPI.Entities
         [ForeignKey("to_user_id")]
         public User To_User { get; set; }
 
-        public string text { get; set; }
-
         public DateTime time_stamp { get; set; }
+
+        [NotMapped]
+        public Dictionary<string, string> parameters { get; set; }
+
     }
 }

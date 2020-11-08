@@ -30,9 +30,10 @@ namespace AcademChatAPI.Migrations
                 {
                     id = table.Column<long>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    type = table.Column<int>(nullable: false),
+                    data = table.Column<string>(nullable: true),
                     user_id = table.Column<long>(nullable: false),
                     to_user_id = table.Column<long>(nullable: true),
-                    text = table.Column<string>(nullable: true),
                     time_stamp = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
@@ -57,11 +58,11 @@ namespace AcademChatAPI.Migrations
                 columns: new[] { "id", "name", "position", "secret", "status" },
                 values: new object[,]
                 {
-                    { 1L, "VitalyV", "CEO", "B/9HOf6JVnY+eHf4bLqarA==", null },
-                    { 2L, "ValeryM", "CTO", "B/9HOf6JVnY+eHf4bLqarA==", null },
-                    { 3L, "MatveyF", "Lead", "B/9HOf6JVnY+eHf4bLqarA==", null },
-                    { 4L, "NatalyaN", "CFO", "B/9HOf6JVnY+eHf4bLqarA==", null },
-                    { 5L, "AydarA", "SWE", "B/9HOf6JVnY+eHf4bLqarA==", null }
+                    { 1L, "Vitaly", "CEO", "B/9HOf6JVnY+eHf4bLqarA==", "Using ChatClient" },
+                    { 2L, "Valery", "CTO", "B/9HOf6JVnY+eHf4bLqarA==", "Using ChatClient" },
+                    { 3L, "Matvey", "Lead", "B/9HOf6JVnY+eHf4bLqarA==", "Free for chat" },
+                    { 4L, "Natalya", "CFO", "B/9HOf6JVnY+eHf4bLqarA==", "Come to taste a coockies!" },
+                    { 5L, "Aydar", "SWE", "B/9HOf6JVnY+eHf4bLqarA==", "Busy" }
                 });
 
             migrationBuilder.CreateIndex(

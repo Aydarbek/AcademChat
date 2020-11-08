@@ -5,6 +5,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace AcademChatAPI.WebSocketManager
 {
@@ -24,7 +25,6 @@ namespace AcademChatAPI.WebSocketManager
 
         public virtual async Task OnDisconnected(WebSocket socket)
         {
-            await SendMessageToAllAsync($"User is disconnected: \r\n{wsConnectionManager.GetId(socket)}");
             await wsConnectionManager.RemoveSocket(wsConnectionManager.GetId(socket));
         }
 

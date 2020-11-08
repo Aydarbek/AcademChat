@@ -26,7 +26,7 @@ namespace ChatClient
 
         private void LoginForm_OnMessage(object sender, WebSocketSharp.MessageEventArgs e)
         {
-            WsMessage wsMessage = JsonConvert.DeserializeObject<WsMessage>(e.Data);
+            WsChatModels.Message wsMessage = JsonConvert.DeserializeObject<WsChatModels.Message>(e.Data);
             if (wsMessage != null && wsMessage.type == WsMessageType.System)
                 PrintWsMessage(wsMessage.data);
         }

@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AcademChatAPI.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    [Migration("20201107201659_InitialDb")]
+    [Migration("20201108105746_InitialDb")]
     partial class InitialDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,7 +28,7 @@ namespace AcademChatAPI.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("text")
+                    b.Property<string>("data")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("time_stamp")
@@ -37,7 +37,11 @@ namespace AcademChatAPI.Migrations
                     b.Property<long?>("to_user_id")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("user_id")
+                    b.Property<int>("type")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("user_id")
+                        .IsRequired()
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
@@ -81,37 +85,42 @@ namespace AcademChatAPI.Migrations
                         new
                         {
                             id = 1L,
-                            name = "VitalyV",
+                            name = "Vitaly",
                             position = "CEO",
-                            secret = "B/9HOf6JVnY+eHf4bLqarA=="
+                            secret = "B/9HOf6JVnY+eHf4bLqarA==",
+                            status = "Using ChatClient"
                         },
                         new
                         {
                             id = 2L,
-                            name = "ValeryM",
+                            name = "Valery",
                             position = "CTO",
-                            secret = "B/9HOf6JVnY+eHf4bLqarA=="
+                            secret = "B/9HOf6JVnY+eHf4bLqarA==",
+                            status = "Using ChatClient"
                         },
                         new
                         {
                             id = 3L,
-                            name = "MatveyF",
+                            name = "Matvey",
                             position = "Lead",
-                            secret = "B/9HOf6JVnY+eHf4bLqarA=="
+                            secret = "B/9HOf6JVnY+eHf4bLqarA==",
+                            status = "Free for chat"
                         },
                         new
                         {
                             id = 4L,
-                            name = "NatalyaN",
+                            name = "Natalya",
                             position = "CFO",
-                            secret = "B/9HOf6JVnY+eHf4bLqarA=="
+                            secret = "B/9HOf6JVnY+eHf4bLqarA==",
+                            status = "Come to taste a coockies!"
                         },
                         new
                         {
                             id = 5L,
-                            name = "AydarA",
+                            name = "Aydar",
                             position = "SWE",
-                            secret = "B/9HOf6JVnY+eHf4bLqarA=="
+                            secret = "B/9HOf6JVnY+eHf4bLqarA==",
+                            status = "Busy"
                         });
                 });
 
