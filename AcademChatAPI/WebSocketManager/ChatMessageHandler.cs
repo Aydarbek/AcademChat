@@ -152,7 +152,17 @@ namespace AcademChatAPI.WebSocketManager
 
             User user = _context.Users.FirstOrDefault(u => u.name.Equals(userName));
             if (user == null)
-                throw new ChatException("User not found.");
+            {
+                user = new User
+                {
+                    name = userName,
+                    password = password,
+                    status = "Using ChatClient."
+                };
+
+                _context.Add(user);
+                await _context.SaveChangesAsync();
+            }
 
             Message authGrant = new Message
             {
