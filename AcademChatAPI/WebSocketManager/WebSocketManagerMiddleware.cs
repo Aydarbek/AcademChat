@@ -14,35 +14,45 @@ namespace AcademChatAPI.WebSocketManager
     {
         private readonly RequestDelegate _next;
         private WebSocketHandler _webSocketHandler;
+        private ILogger<WebSocketManagerMiddleware> _logger;
 
-        public WebSocketManagerMiddleware(WebSocketHandler webSocketController, RequestDelegate next)
+        public WebSocketManagerMiddleware(WebSocketHandler webSocketController, RequestDelegate next, ILogger<WebSocketManagerMiddleware> logger)
         {
             _next = next;
             _webSocketHandler = webSocketController;
+            _logger = logger;
         }
 
         public async Task Invoke(HttpContext context)
-        {            
+        {
             if (!context.WebSockets.IsWebSocketRequest)
                 return;
-
             var socket = await context.WebSockets.AcceptWebSocketAsync();
-            await _webSocketHandler.OnConnected(socket);
-
-            await Receive(socket, async (result, buffer) =>
+            try
             {
-                if (result.MessageType == WebSocketMessageType.Text)
-                {
-                    await _webSocketHandler.ReceiveAsync(socket, result, buffer);
-                    return;
-                }
+               
+                await _webSocketHandler.OnConnected(socket);
 
-                else if (result.MessageType == WebSocketMessageType.Close)
+                await Receive(socket, async (result, buffer) =>
                 {
-                    await _webSocketHandler.OnDisconnected(socket);
-                    return;
-                }
-            });
+                    if (result.MessageType == WebSocketMessageType.Text)
+                    {
+                        await _webSocketHandler.ReceiveAsync(socket, result, buffer);
+                        return;
+                    }
+
+                    else if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        await _webSocketHandler.OnDisconnected(socket);
+                        return;
+                    }
+                });
+            }
+            catch (WebSocketException ex)
+            {
+                _logger.LogError(ex.Message);
+                await _webSocketHandler.OnDisconnected(socket);
+            }
         }
 
         private async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)

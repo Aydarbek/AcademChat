@@ -11,6 +11,7 @@ namespace AcademChatAPI.Entities
     [Serializable]
     public class Message
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Required]
         public long id { get; set; }
 
@@ -33,6 +34,5 @@ namespace AcademChatAPI.Entities
 
         [NotMapped]
         public Dictionary<string, string> parameters { get; set; }
-
     }
 }

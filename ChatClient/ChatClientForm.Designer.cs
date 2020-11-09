@@ -35,6 +35,9 @@
             this.inputTextBox = new System.Windows.Forms.TextBox();
             this.sendButton = new System.Windows.Forms.Button();
             this.controlPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.menuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.logoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.userNameText = new System.Windows.Forms.TextBox();
             this.statusLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.statusTextBox = new System.Windows.Forms.TextBox();
@@ -43,9 +46,11 @@
             this.publicChatButton = new System.Windows.Forms.Button();
             this.onlineUsersLabel = new System.Windows.Forms.TextBox();
             this.onlineUsersPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.logoutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.mainLayoutPanel.SuspendLayout();
             this.chatPanel.SuspendLayout();
             this.controlPanel.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.statusLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -113,6 +118,7 @@
             // 
             // controlPanel
             // 
+            this.controlPanel.Controls.Add(this.menuStrip1);
             this.controlPanel.Controls.Add(this.userNameText);
             this.controlPanel.Controls.Add(this.statusLayoutPanel);
             this.controlPanel.Controls.Add(this.publicChatButton);
@@ -125,10 +131,36 @@
             this.controlPanel.Size = new System.Drawing.Size(191, 458);
             this.controlPanel.TabIndex = 1;
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(178, 24);
+            this.menuStrip1.TabIndex = 13;
+            this.menuStrip1.Text = "Logout";
+            // 
+            // menuToolStripMenuItem
+            // 
+            this.menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.logoutToolStripMenuItem,
+            this.logoutToolStripMenuItem1});
+            this.menuToolStripMenuItem.Name = "menuToolStripMenuItem";
+            this.menuToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
+            this.menuToolStripMenuItem.Text = "Menu";
+            // 
+            // logoutToolStripMenuItem
+            // 
+            this.logoutToolStripMenuItem.Name = "logoutToolStripMenuItem";
+            this.logoutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.logoutToolStripMenuItem.Text = "Reconnect";
+            this.logoutToolStripMenuItem.Click += new System.EventHandler(this.logoutToolStripMenuItem_Click);
+            // 
             // userNameText
             // 
             this.userNameText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
-            this.userNameText.Location = new System.Drawing.Point(2, 2);
+            this.userNameText.Location = new System.Drawing.Point(2, 26);
             this.userNameText.Margin = new System.Windows.Forms.Padding(2);
             this.userNameText.Name = "userNameText";
             this.userNameText.ReadOnly = true;
@@ -142,7 +174,7 @@
             this.statusLayoutPanel.Controls.Add(this.cancelStatusButton);
             this.statusLayoutPanel.Controls.Add(this.acceptStatusButton);
             this.statusLayoutPanel.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-            this.statusLayoutPanel.Location = new System.Drawing.Point(2, 32);
+            this.statusLayoutPanel.Location = new System.Drawing.Point(2, 56);
             this.statusLayoutPanel.Margin = new System.Windows.Forms.Padding(2);
             this.statusLayoutPanel.Name = "statusLayoutPanel";
             this.statusLayoutPanel.Size = new System.Drawing.Size(188, 59);
@@ -189,22 +221,23 @@
             // 
             // publicChatButton
             // 
+            this.publicChatButton.BackColor = System.Drawing.SystemColors.ControlDark;
             this.publicChatButton.Font = new System.Drawing.Font("Arial Narrow", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.publicChatButton.Location = new System.Drawing.Point(2, 95);
+            this.publicChatButton.Location = new System.Drawing.Point(2, 119);
             this.publicChatButton.Margin = new System.Windows.Forms.Padding(2);
             this.publicChatButton.Name = "publicChatButton";
             this.publicChatButton.Size = new System.Drawing.Size(185, 30);
             this.publicChatButton.TabIndex = 8;
             this.publicChatButton.Text = "Public Chat";
             this.publicChatButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.publicChatButton.UseVisualStyleBackColor = true;
+            this.publicChatButton.UseVisualStyleBackColor = false;
             this.publicChatButton.Click += new System.EventHandler(this.publicChatButton_Click);
             // 
             // onlineUsersLabel
             // 
             this.onlineUsersLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.onlineUsersLabel.Font = new System.Drawing.Font("Arial Narrow", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.onlineUsersLabel.Location = new System.Drawing.Point(3, 130);
+            this.onlineUsersLabel.Location = new System.Drawing.Point(3, 154);
             this.onlineUsersLabel.Name = "onlineUsersLabel";
             this.onlineUsersLabel.ReadOnly = true;
             this.onlineUsersLabel.Size = new System.Drawing.Size(184, 19);
@@ -213,10 +246,17 @@
             // 
             // onlineUsersPanel
             // 
-            this.onlineUsersPanel.Location = new System.Drawing.Point(3, 155);
+            this.onlineUsersPanel.Location = new System.Drawing.Point(3, 179);
             this.onlineUsersPanel.Name = "onlineUsersPanel";
-            this.onlineUsersPanel.Size = new System.Drawing.Size(184, 280);
+            this.onlineUsersPanel.Size = new System.Drawing.Size(184, 251);
             this.onlineUsersPanel.TabIndex = 11;
+            // 
+            // logoutToolStripMenuItem1
+            // 
+            this.logoutToolStripMenuItem1.Name = "logoutToolStripMenuItem1";
+            this.logoutToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.logoutToolStripMenuItem1.Text = "Logout";
+            this.logoutToolStripMenuItem1.Click += new System.EventHandler(this.logoutToolStripMenuItem1_Click);
             // 
             // chatClientForm
             // 
@@ -226,6 +266,7 @@
             this.Controls.Add(this.mainLayoutPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.Name = "chatClientForm";
@@ -237,6 +278,8 @@
             this.chatPanel.PerformLayout();
             this.controlPanel.ResumeLayout(false);
             this.controlPanel.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.statusLayoutPanel.ResumeLayout(false);
             this.statusLayoutPanel.PerformLayout();
             this.ResumeLayout(false);
@@ -259,6 +302,10 @@
         private System.Windows.Forms.Button publicChatButton;
         private System.Windows.Forms.TextBox onlineUsersLabel;
         private System.Windows.Forms.FlowLayoutPanel onlineUsersPanel;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem logoutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem logoutToolStripMenuItem1;
     }
 }
 

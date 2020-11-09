@@ -11,6 +11,7 @@ namespace AcademChatAPI.Entities
     [Serializable]
     public class User
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Required]
         public long id { get; set; }
 

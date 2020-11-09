@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -44,9 +45,15 @@ namespace ChatClient
 
         private void Login_Click(object sender, EventArgs e)
         {
-            if (userNameBox.Text != "" && passwordBox.Text != "")
-                MainForm.WsSendAuthenticationRequest(userNameBox.Text, passwordBox.Text);
+            try
+            {
+                if (userNameBox.Text != "" && passwordBox.Text != "")
+                    MainForm.WsSendAuthenticationRequest(userNameBox.Text, passwordBox.Text);
+            }
+            catch (WebSocketException ex)
+            {
+                PrintMessage(ex.Message);
+            }
         }
-
     }
 }

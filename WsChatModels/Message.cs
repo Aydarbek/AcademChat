@@ -6,8 +6,8 @@ namespace WsChatModels
     [Serializable]
     public enum WsMessageType
     {
-        System, Chat, Status, AuthRequest, AuthGrant,
-        User, Users, Message, Messages
+        System, Chat, Status, AuthRequest, AuthGrant, Logout,
+        User, Users, Message, Messages, MessagesRequest
     }
 
     [Serializable]
@@ -29,6 +29,11 @@ namespace WsChatModels
             this.user_id = user_id;
             this.type = type;
             this.data = data;
+        }
+
+        public override string ToString()
+        {
+            return $"{User.name}({time_stamp.ToString("HH:mm")}): {data.Trim('\"')}";
         }
     }
 }

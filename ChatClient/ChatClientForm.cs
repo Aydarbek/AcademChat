@@ -23,7 +23,8 @@ namespace ChatClient
 
         private delegate void SafeCallDelegateEmpty();
         public User CurrentUser { get; private set; }
-        long? selectedUserId = null;
+        long? selectedUserId;
+        User selectectUser;
 
         internal WebSocket webSocket;
         loginForm loginForm;
@@ -40,9 +41,8 @@ namespace ChatClient
             InitWebSocket();
             this.ActiveControl = inputTextBox;
             loginForm = new loginForm();
-            loginForm.ShowDialog();
-            if (loginForm.DialogResult == DialogResult.Cancel)
-                this.Close();
+            MakeLoginDialog();
+            RequestLastMessages();
         }
 
         private void InitWebSocket()
@@ -135,31 +135,29 @@ namespace ChatClient
         {
             try
             {
-                WsChatModels.Message wsMessage = JsonConvert.DeserializeObject<WsChatModels.Message>(e.Data);
+                WsChatModels.Message wsMessage = JsonConvert.DeserializeObject<Message>(e.Data);
                 if (wsMessage == null)
                     return;
 
                 switch (wsMessage.type)
                 {
                     case WsMessageType.Chat:
-                        if (selectedUserId != null && 
-                            (selectedUserId == wsMessage.user_id || selectedUserId == wsMessage.to_user_id) &&
-                            (CurrentUser.id == wsMessage.user_id || CurrentUser.id == wsMessage.to_user_id))
-                            PrintWsMessage($"{wsMessage.User.name} {wsMessage.time_stamp.ToString("HH:mm")}:  {wsMessage.data.Trim('\"')}");
-                        else if (selectedUserId == null)
-                            PrintWsMessage($"{wsMessage.User.name} {wsMessage.time_stamp.ToString("HH:mm")}:  {wsMessage.data.Trim('\"')}");
+                        DispatchChatMessage(wsMessage);
                         break;
                     case WsMessageType.System:
                         PrintWsMessage($"System {wsMessage.time_stamp.ToString("HH:mm")}:  {wsMessage.data.Trim('\"')}");
                         break;
-                    case WsMessageType.AuthGrant:                        
+                    case WsMessageType.AuthGrant:
                         EnterProgram(wsMessage);
                         break;
                     case WsMessageType.AuthRequest:
-                        loginForm.ShowDialog();
+                        MakeLoginDialog();
                         break;
                     case WsMessageType.Users:
                         ShowOnlineUsers(wsMessage.data);
+                        break;
+                    case WsMessageType.Messages:
+                        ShowLastMessages(wsMessage);
                         break;
                 }
             }
@@ -167,6 +165,36 @@ namespace ChatClient
             {
                 Debug.WriteLine(ex.Message);
             }
+        }
+
+        private void DispatchChatMessage(Message wsMessage)
+        {
+            if (selectedUserId != null &&
+                IsCurrentChatActive(wsMessage) &&
+                IsCurrentUserBelongToMessage(wsMessage))
+                    PrintWsMessage(wsMessage.ToString());
+            else if (IsMessageFromOtherChat(wsMessage))
+            {
+                SwitchToPrivateChat(wsMessage.user_id);
+                PrintWsMessage(wsMessage.ToString());
+            }
+            else if (selectedUserId == null)
+                PrintWsMessage(wsMessage.ToString());
+        }
+
+        private bool IsMessageFromOtherChat(Message wsMessage)
+        {
+            return wsMessage.to_user_id != null && selectedUserId != wsMessage.user_id;
+        }
+
+        private bool IsCurrentUserBelongToMessage(Message wsMessage)
+        {
+            return (CurrentUser.id == wsMessage.user_id || CurrentUser.id == wsMessage.to_user_id);
+        }
+
+        private bool IsCurrentChatActive(Message wsMessage)
+        {
+            return (selectedUserId == wsMessage.user_id || selectedUserId == wsMessage.to_user_id);
         }
 
         private void ShowOnlineUsers(string usersJson)
@@ -177,6 +205,45 @@ namespace ChatClient
             if (users != null)
                 foreach (User user in users)
                     AddOnlineUserButton(user);
+        }
+
+
+        private void ShowLastMessages(Message wsMessage)
+        {
+            List<Message> lastMessages = JsonConvert.DeserializeObject<List<Message>>(wsMessage.data);
+            if (lastMessages == null)
+                return;
+            foreach (Message message in lastMessages)
+                PrintWsMessage(message.ToString());
+        }
+
+
+
+        private void MakeLoginDialog()
+        {
+            if (loginForm.InvokeRequired)
+            {
+                threadSafeAction = MakeLoginDialog;
+                loginForm.Invoke(threadSafeAction);
+            }
+            else
+            {
+                loginForm.ShowDialog(this);
+                if (loginForm.DialogResult == DialogResult.Cancel)
+                    this.Close();
+            }
+        }
+
+        private void RequestLastMessages()
+        {
+            Message request = new Message
+            {
+                type = WsMessageType.MessagesRequest,
+                user_id = CurrentUser.id,
+                to_user_id = selectedUserId
+            };
+
+            webSocket.Send(JsonConvert.SerializeObject(request));
         }
 
         private void ClearOnlineUsersPanel()
@@ -201,13 +268,13 @@ namespace ChatClient
             {
                 Button button = new Button();
                 button.Text = user.name;
-                button.Tag = user.id;                
+                button.Tag = user;                
                 button.Width = 180;
                 button.Height = 30;
                 onlineUsersPanel.Controls.Add(button);
                 button.Click += new EventHandler(UserButtonClick);
 
-                if (button.Tag.ToString() == selectedUserId.ToString())
+                if (((User)button.Tag).id == selectedUserId)
                     button.BackColor = Color.DarkGray;
                 else if (selectedUserId == null)
                     publicChatButton.BackColor = Color.DarkGray;
@@ -217,19 +284,32 @@ namespace ChatClient
         private void UserButtonClick(object sender, EventArgs e)
         {
             Button userButton = (Button)sender;
+            long userId = ((User)userButton.Tag).id;
             
+            if (selectedUserId != userId)
+            {
+                selectectUser = (User)userButton.Tag;
+                SwitchToPrivateChat(userId);
+            }
+        }
+
+        private void SwitchToPrivateChat(long? userId)
+        {
+            selectedUserId = userId;
+
             var buttons = GetAll(onlineUsersPanel, typeof(Button));
             foreach (Button button in buttons)
             {
-                if (button != userButton)
+                if (((User)button.Tag).id != userId)
                     button.BackColor = Color.LightGray;
                 else
                     button.BackColor = Color.DarkGray;
             }
-
             publicChatButton.BackColor = Color.LightGray;
-
-            selectedUserId = Int64.Parse(userButton.Tag.ToString());            
+            ResetMessageScreen();
+            PrintWsMessage("PRIVATE CHAT:");
+            PrintWsMessage($"USER: {selectectUser.name} WITH STATUS: {selectectUser.status}");
+            RequestLastMessages();
         }
 
         private void EnterProgram(Message wsMessage)
@@ -294,6 +374,19 @@ namespace ChatClient
             else
             {
                 mainTextBox.AppendText(text + "\r\n");
+            }
+        }
+
+        private void ResetMessageScreen()
+        {
+            if (this.mainTextBox.InvokeRequired)
+            {
+                threadSafeAction = ResetMessageScreen;
+                mainTextBox.Invoke(threadSafeAction);
+            }
+            else
+            {
+                mainTextBox.Text = "";
             }
         }
 
@@ -385,12 +478,32 @@ namespace ChatClient
         }
 
         private void SwitchToPublicChat()
-        {
+        {            
             publicChatButton.BackColor = Color.DarkGray;
             selectedUserId = null;
             var onlineButtons = GetAll(onlineUsersPanel, typeof(Button));
             foreach (Button button in onlineButtons)
                 button.BackColor = Color.LightGray;
+            ResetMessageScreen();
+            PrintWsMessage("PUBLIC CHAT:\n");
+            RequestLastMessages();
+        }
+
+        private void logoutToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Message logout = new Message
+            {
+                user_id = CurrentUser.id,
+                type = WsMessageType.Logout
+            };
+            webSocket.Send(JsonConvert.SerializeObject(logout));
+            MakeLoginDialog();
+        }
+
+        private void logoutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (webSocket.ReadyState != WebSocketState.Open)
+                InitWebSocket();
         }
     }
 }

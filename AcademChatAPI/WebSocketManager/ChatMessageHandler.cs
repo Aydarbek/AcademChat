@@ -14,6 +14,7 @@ using AcademChatAPI.Entities;
 using System.Collections.Concurrent;
 using User = AcademChatAPI.Entities.User;
 using Message = AcademChatAPI.Entities.Message;
+using Microsoft.EntityFrameworkCore;
 
 namespace AcademChatAPI.WebSocketManager
 {
@@ -66,7 +67,7 @@ namespace AcademChatAPI.WebSocketManager
             {
                 currWebsocket = socket;
                 string wsMessageJson = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                Message wsMessage = JsonConvert.DeserializeObject<Entities.Message>(wsMessageJson);
+                Message wsMessage = JsonConvert.DeserializeObject<Message>(wsMessageJson);
                 
                 await HandleWsMessage(wsMessage);
             }
@@ -82,7 +83,7 @@ namespace AcademChatAPI.WebSocketManager
 
         private async Task SendSystemMessage(string socketId, ChatException ex)
         {
-            Message wsMessage = new Entities.Message
+            Message wsMessage = new Message
             {
                 type = WsMessageType.System,
                 data = ex.Message,
@@ -91,7 +92,7 @@ namespace AcademChatAPI.WebSocketManager
             await SendMessageAsync(socketId, JsonConvert.SerializeObject(wsMessage));
         }
 
-        private async Task HandleWsMessage(Entities.Message wsMessage)
+        private async Task HandleWsMessage(Message wsMessage)
         {
             User fromUser = _context.Users.Find(wsMessage.user_id);
             if (currWebsocket != null && fromUser != null)
@@ -105,7 +106,7 @@ namespace AcademChatAPI.WebSocketManager
                     }
                 }
                 else
-                    SendAuthRequest(currWebsocket);
+                    await SendAuthRequest(currWebsocket);
             }
 
             switch (wsMessage.type)
@@ -116,20 +117,26 @@ namespace AcademChatAPI.WebSocketManager
                 case (WsMessageType.AuthRequest):
                     await HandleAuthenticationRequest(wsMessage);
                     break;
+                case (WsMessageType.Logout):
+                    await HandleLogoutRequest(wsMessage);
+                    break;
+                case (WsMessageType.MessagesRequest):
+                    await GetLastMessages(wsMessage);
+                    break;
                 case (WsMessageType.Status):
                     await HandleStatusMessage(wsMessage);
                     break;
             }
         }
 
-        private async void SendAuthRequest(WebSocket currWebsocket)
+        private async Task SendAuthRequest(WebSocket currWebsocket)
         {
-            Entities.Message authRequest = new Entities.Message { type = WsMessageType.AuthRequest };
+            Message authRequest = new Message { type = WsMessageType.AuthRequest };
             await SendMessageAsync(currWebsocket, JsonConvert.SerializeObject(authRequest));
-
         }
 
-        private async Task HandleAuthenticationRequest(Entities.Message wsMessage)
+
+        private async Task HandleAuthenticationRequest(Message wsMessage)
         {
             string userName;
             string password;
@@ -145,7 +152,7 @@ namespace AcademChatAPI.WebSocketManager
 
             User user = _context.Users.FirstOrDefault(u => u.name.Equals(userName));
             if (user == null)
-                throw new ChatException("User not found");
+                throw new ChatException("User not found.");
 
             Message authGrant = new Message
             {
@@ -168,6 +175,19 @@ namespace AcademChatAPI.WebSocketManager
             }
             else
                 throw new ChatException("Password is incorrect");
+        }
+
+
+        private async Task HandleLogoutRequest(Message wsMessage)
+        {
+            User user = _context.Users.Find(wsMessage.user_id);
+
+            WebSocket socket;
+            if (UserWebsockets.TryRemove(user.name, out socket))
+            {
+                await SendMessageToAllAsync(new Message { type = WsMessageType.System, data = $"User {user.name} disconnected."});
+                UpdateOnlineUsersInfo();
+            }
         }
 
         private async void UpdateOnlineUsersInfo()
@@ -216,6 +236,36 @@ namespace AcademChatAPI.WebSocketManager
 
             await _context.SaveChangesAsync();
         }
+
+
+        private async Task GetLastMessages(Message wsMessage)
+        {
+            List<Message> messages;
+            if (wsMessage.to_user_id != null)
+                messages = _context.Messages.Where(m => (m.user_id == wsMessage.user_id || m.to_user_id == wsMessage.user_id) &&
+                                                        (m.user_id == wsMessage.to_user_id || m.to_user_id == wsMessage.to_user_id))
+                                            .Include(m => m.User)
+                                            .Include(m => m.To_User)
+                                            .OrderByDescending(m => m.time_stamp)
+                                            .Take(10)
+                                            .ToList();
+            else
+                messages = _context.Messages.Where(m => m.to_user_id == null)
+                                            .Include(m => m.User)
+                                            .Include(m => m.To_User)
+                                            .OrderByDescending(m => m.time_stamp)
+                                            .Take(10)
+                                            .ToList();
+
+            Message lastMessages = new Message
+            {
+                type = WsMessageType.Messages,
+                data = JsonConvert.SerializeObject(messages)
+            };
+
+            await SendMessageAsync(wsMessage.user_id, lastMessages);
+        }
+
 
         private async Task SendMessageAsync (long? toUserid, Message message)
         {
